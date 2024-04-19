@@ -2,7 +2,7 @@
 
 import HomepageNavbar from "@/components/HomepageNavbar";
 import { useEffect, useState } from "react";
-import { AiFillBulb } from "react-icons/ai";
+import { AiFillBulb, AiFillStar } from "react-icons/ai";
 import { BsMicFill } from "react-icons/bs";
 import { IoDocumentText } from "react-icons/io5";
 
@@ -120,6 +120,65 @@ export default function Home() {
                         ))
                     }
                 </div>
+            </div>
+            {/*TESTIMONIALS SECTION*/}
+            <div className="flex flex-col items-center my-12">
+                <h2 className="text-xl md:text-3xl font-bold text-center mb-8 text-[#032b41]">What our members say</h2>
+                <div className=" mb-12">
+                    <div className="w-[90%] max-w-[800px] mx-auto my-6 p-6 bg-[#fff3d7]">
+                        <div className="flex items-center space-x-2">
+                            <h4 className="font-light text-lg text-[#032b41]">Hanna M.</h4>
+                            <div className="flex text-[#0365f2]">
+                                <AiFillStar />
+                                <AiFillStar />
+                                <AiFillStar />
+                                <AiFillStar />
+                                <AiFillStar />
+                            </div>
+                        </div>
+                        <p className="text-sm text-[#394547]">This app has been a <strong className="font-bold">game-changer</strong> for me! It's saved me so much time and effort in reading and comprehending books. Highly recommend it to all book lovers.</p>
+                    </div>
+                    <div className="w-[90%] max-w-[800px] mx-auto my-6 p-6 bg-[#fff3d7]">
+                        <div className="flex items-center space-x-2">
+                            <h4 className="font-light text-lg text-[#032b41]">David B.</h4>
+                            <div className="flex text-[#0365f2]">
+                                <AiFillStar />
+                                <AiFillStar />
+                                <AiFillStar />
+                                <AiFillStar />
+                                <AiFillStar />
+                            </div>
+                        </div>
+                        <p className="text-sm text-[#394547]">I love this app! It provides <strong className="font-bold">concise and accurate summaries</strong> of books in a way that is easy to understand. It's also very user-friendly and intuitive.</p>
+                    </div>
+                    <div className="w-[90%] max-w-[800px] mx-auto my-6 p-6 bg-[#fff3d7]">
+                        <div className="flex items-center space-x-2">
+                            <h4 className="font-light text-lg text-[#032b41]">Nathan S.</h4>
+                            <div className="flex text-[#0365f2]">
+                                <AiFillStar />
+                                <AiFillStar />
+                                <AiFillStar />
+                                <AiFillStar />
+                                <AiFillStar />
+                            </div>
+                        </div>
+                        <p className="text-sm text-[#394547]">This app is a great way to get the main takeaways from a book without having to read the entire thing. <strong className="font-bold">The summaries are well-written and informative.</strong> Definitely worth downloading.</p>
+                    </div>
+                    <div className="w-[90%] max-w-[800px] mx-auto my-6 p-6 bg-[#fff3d7]">
+                        <div className="flex items-center space-x-2">
+                            <h4 className="font-light text-lg text-[#032b41]">Ryan R.</h4>
+                            <div className="flex text-[#0365f2]">
+                                <AiFillStar />
+                                <AiFillStar />
+                                <AiFillStar />
+                                <AiFillStar />
+                                <AiFillStar />
+                            </div>
+                        </div>
+                        <p className="text-sm text-[#394547]">If you're a busy person who <strong className="font-bold">loves reading but doesn't have the time</strong> to read every book in full, this app is for you! The summaries are thorough and provide a great overview of the book's content.</p>
+                    </div>
+                </div>
+                <button className="bg-summarist-green w-[30%] py-2 rounded-md">Login</button>
             </div>
         </div>
     );
