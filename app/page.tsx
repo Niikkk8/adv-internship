@@ -1,6 +1,7 @@
 "use client"
 import Footer from "@/components/Footer";
 import HomepageNavbar from "@/components/HomepageNavbar";
+import { openLoginModal } from "@/redux/modalSlice";
 import { useEffect, useState } from "react";
 import { AiFillBulb, AiFillStar } from "react-icons/ai";
 import { BiCrown, BiLeaf } from "react-icons/bi";
@@ -8,6 +9,7 @@ import { BsMicFill } from "react-icons/bs";
 import { FaStarHalfAlt } from "react-icons/fa";
 import { FaStar } from "react-icons/fa6";
 import { IoDocumentText } from "react-icons/io5";
+import { useDispatch, useSelector } from "react-redux";
 
 interface feature {
     icon: React.ElementType,
@@ -15,15 +17,16 @@ interface feature {
     para: string
 }
 
+{/*
+    text-[#0365f2]
+    text-[#394547]
+    text-[#032b41]
+*/}
+
 export default function Home() {
+    const dispatch = useDispatch()
     const [activeIndex1, setActiveIndex1] = useState<number>(0);
     const [activeIndex2, setActiveIndex2] = useState<number>(0);
-
-    {/*
-        text-[#0365f2]
-        text-[#394547]
-        text-[#032b41]
-    */}
 
     const featuresData = [
         { icon: IoDocumentText, title: "Read or listen", para: "Save time by getting the core ideas from the latest books." },
@@ -56,7 +59,7 @@ export default function Home() {
                     <div className="w-[80%] md:w-[50%] my-4 md:my-8 text-center md:text-left">
                         <h1 className="font-bold text-2xl md:text-4xl mb-6 w-full md:w-[75%] text-[#032b41]">Gain more knowledge in less time</h1>
                         <p className="font-light text-lg md:text-xl mb-8 text-[#394547]">Great summaries for busy people,<br /> individuals who barely have time to read,<br /> and even people who don't like to read.</p>
-                        <button className="bg-summarist-green w-[60%] py-2 rounded-md">Login</button>
+                        <button className="bg-summarist-green w-[60%] py-2 rounded-md" onClick={() => dispatch(openLoginModal())}>Login</button>
                     </div>
                     <img src="/assets/landing.png" alt="" className="w-[40%] hidden md:inline" />
                 </div>
