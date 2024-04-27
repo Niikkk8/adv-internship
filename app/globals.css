@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.button-transform:active {
+    transform: translate(1px, 1px);
+}
