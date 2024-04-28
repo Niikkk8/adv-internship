@@ -93,7 +93,7 @@ export default function LoginModal() {
                             <button type="submit" className='button-transform bg-summarist-green my-4 p-2 rounded-md'>Sign Up</button>
                         </form>
                     )}
-                    <button onClick={toggleLogin} className='absolute bottom-0 p-3 pt-4 text-blue-500 hover:bg-gray-300 w-full active:bg-blue-500 active:text-white'>
+                    <button onClick={toggleLogin} className='absolute bottom-0 p-3 pt-4 text-blue-500 hover:bg-gray-300 w-full active:bg-blue-400 active:text-white'>
                         {loginInterface ? "Don't have an account?" : "Already have an account?"}
                     </button>
                 </div>
