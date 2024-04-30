@@ -5,3 +5,17 @@
 .button-transform:active {
     transform: translate(1px, 1px);
 }
+
+.sidebar-active {
+    position: relative !important;
+}
+
+.sidebar-active::before {
+    content: '' !important;
+    position: absolute !important;
+    height: 200% !important;
+    width: 4px !important;
+    left: -2rem !important;
+    top: -1rem !important;
+    background-color: #2bd97c !important;
+}
