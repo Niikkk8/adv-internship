@@ -9,11 +9,13 @@ import { IoHomeOutline, IoSearchOutline, IoSettingsOutline } from 'react-icons/i
 export default function Sidebar() {
     const router = usePathname();
     return (
-        <div className='p-6 flex flex-col justify-between h-screen border-r bg-[#f7faf9]'>
+        <div className='flex flex-col justify-between h-screen border-r bg-[#f7faf9]'>
             <div>
-                <img src='/assets/logo.png' className='w-40 h-10 mb-8' alt='' />
+                <div className='p-6'>
+                    <img src='/assets/logo.png' className='w-40 h-10' alt='' />
+                </div>
                 <ul className='my-4'>
-                    <li className={`flex items-center space-x-4 ml-2 my-6 ${router === '/for-you' ? 'sidebar-active' : ''}`}>
+                    <li className={`flex items-center space-x-4 pl-6 pr-4 py-3 my-2 hover:bg-gray-200 ${router === '/for-you' && 'sidebar-active'}`}>
                         <Link href='/for-you'>
                             <span className='flex items-center space-x-2'>
                                 <IoHomeOutline size={28} />
@@ -21,7 +23,7 @@ export default function Sidebar() {
                             </span>
                         </Link>
                     </li>
-                    <li className={`flex items-center space-x-4 ml-2 my-6 ${router === '/library' ? 'sidebar-active' : ''}`}>
+                    <li className={`flex items-center space-x-4 pl-6 pr-4 py-3 my-2 hover:bg-gray-200 ${router === '/library' ? 'sidebar-active' : ''}`}>
                         <Link href='/library'>
                             <span className='flex items-center space-x-2'>
                                 <CiBookmark size={28} />
@@ -29,11 +31,11 @@ export default function Sidebar() {
                             </span>
                         </Link>
                     </li>
-                    <li className='flex items-center space-x-4 ml-2 my-6 cursor-not-allowed'>
+                    <li className='flex items-center space-x-4 pl-6 pr-4 py-3 my-2 cursor-not-allowed'>
                         <BiHighlight size={28} />
                         <h2 className='text-lg'>Highlights</h2>
                     </li>
-                    <li className='flex items-center space-x-4 ml-2 my-6 cursor-not-allowed'>
+                    <li className='flex items-center space-x-4 pl-6 pr-4 py-3 my-2 cursor-not-allowed'>
                         <IoSearchOutline size={28} />
                         <h2 className='text-lg'>Search</h2>
                     </li>
@@ -41,7 +43,7 @@ export default function Sidebar() {
             </div>
             <div>
                 <ul className='my-4'>
-                    <li className={`flex items-center space-x-4 ml-2 my-6 ${router === '/settings' ? 'sidebar-active' : ''}`}>
+                    <li className={`flex items-center space-x-4 pl-6 pr-4 py-3 my-2 hover:bg-gray-200 ${router === '/settings' ? 'sidebar-active' : ''}`}>
                         <Link href='/settings'>
                             <span className='flex items-center space-x-2'>
                                 <IoSettingsOutline size={28} />
@@ -49,11 +51,11 @@ export default function Sidebar() {
                             </span>
                         </Link>
                     </li>
-                    <li className='flex items-center space-x-4 ml-2 my-6 cursor-not-allowed'>
+                    <li className='flex items-center space-x-4 pl-6 pr-4 py-3 my-2 cursor-not-allowed'>
                         <IoMdHelpCircleOutline size={28} />
                         <h2 className='text-lg'>Help & Support</h2>
                     </li>
-                    <li className='flex items-center space-x-4 ml-2 my-6 cursor-not-allowed'>
+                    <li className='flex items-center space-x-4 pl-6 pr-4 py-3 my-2 cursor-not-allowed'>
                         <BiLogOut size={28} />
                         <h2 className='text-lg'>Logout</h2>
                     </li>

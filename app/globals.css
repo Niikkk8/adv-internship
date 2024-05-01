@@ -13,9 +13,9 @@
 .sidebar-active::before {
     content: '' !important;
     position: absolute !important;
-    height: 200% !important;
+    height: 100% !important;
     width: 4px !important;
-    left: -2rem !important;
-    top: -1rem !important;
+    left: 0 !important;
+    top: 0 !important;
     background-color: #2bd97c !important;
 }
