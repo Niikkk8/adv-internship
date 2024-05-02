@@ -19,3 +19,7 @@
     top: 0 !important;
     background-color: #2bd97c !important;
 }
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}

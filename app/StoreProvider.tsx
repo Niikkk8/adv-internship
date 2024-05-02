@@ -21,7 +21,7 @@ export default function StoreProvider({ children }: { children: React.ReactNode 
     return (
         <Provider store={storeRef.current}>
             {!isHomePage && <Sidebar />}
-            <div className="w-full">
+            <div className="w-full overflow-hidden">
                 {!isSettingsPage && !isHomePage && <SearchBar />}
                 {children}
             </div>
