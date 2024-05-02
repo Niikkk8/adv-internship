@@ -22,7 +22,7 @@ export default function StoreProvider({ children }: { children: React.ReactNode 
         <Provider store={storeRef.current}>
             {!isHomePage && <Sidebar />}
             <div className="w-full">
-                {!isSettingsPage && <SearchBar />}
+                {!isSettingsPage && !isHomePage && <SearchBar />}
                 {children}
             </div>
         </Provider>
