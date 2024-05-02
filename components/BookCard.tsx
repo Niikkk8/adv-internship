@@ -23,7 +23,7 @@ interface BookObject {
 
 const BookCard: React.FC<{ book: BookObject }> = ({ book }) => {
     return (
-        <div className='min-w-[40%] sm:min-w-[25%] lg:min-w-[18%] mx-2 p-2 hover:bg-[#f1f6f4]'>
+        <div className='min-w-[40%] sm:min-w-[25%] lg:min-w-[18%] mx-2 p-2 pb-4 pt-6 hover:bg-[#f1f6f4] rounded-lg'>
             <Image src={book.imageLink} height={180} width={180} alt='' />
             <h2 className='font-bold mt-2'>{book.title}</h2>
             <p className='text-sm font-light mt-2'>{book.author}</p>

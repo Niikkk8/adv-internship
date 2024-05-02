@@ -26,8 +26,10 @@ interface BookObject {
 
 export default function Page() {
     const [selectedBook, setSelectedBook] = useState<BookObject>();
+    const [recommendedBooks, setRecommendedBooks] = useState<BookObject[]>([]);
     const [suggestedBooks, setSuggestedBooks] = useState<BookObject[]>([]);
     const [selectedBookLoading, setSelectedBookLoading] = useState<boolean>(true);
+    const [recommendedBooksLoading, setRecommendedBooksLoading] = useState<boolean>(true);
     const [suggestedBooksLoading, setSuggestedBooksLoading] = useState<boolean>(true);
 
     useEffect(() => {
@@ -41,9 +43,19 @@ export default function Page() {
             }
         };
 
-        const fetchSuggestedBooks = async () => {
+        const fetchRecommendedBooks = async () => {
             try {
                 const response = await axios.get<BookObject[]>('https://us-central1-summaristt.cloudfunctions.net/getBooks?status=recommended');
+                setRecommendedBooks(response.data);
+                setRecommendedBooksLoading(false);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        const fetchSuggestedBooks = async () => {
+            try {
+                const response = await axios.get<BookObject[]>('https://us-central1-summaristt.cloudfunctions.net/getBooks?status=suggested');
                 setSuggestedBooks(response.data);
                 setSuggestedBooksLoading(false);
             } catch (error) {
@@ -52,13 +64,14 @@ export default function Page() {
         };
 
         fetchSelectedBook();
+        fetchRecommendedBooks();
         fetchSuggestedBooks();
     }, []);
 
     return (
-        <div className='max-w-[1200px] mx-auto px-8 py-4'>
+        <div className='max-w-[1200px] mx-auto px-8 py-12'>
             {/* Selected for you */}
-            <div className='mt-8'>
+            <div className='mt-2'>
                 <h1 className='font-bold text-2xl text-[#032b41]'>Selected just for you</h1>
                 <div className='bg-[#fbefd6] mt-4 flex flex-col md:flex-row p-4 w-full lg:w-[60%]'>
                     {selectedBookLoading ?
@@ -83,6 +96,22 @@ export default function Page() {
             <div className='mt-6'>
                 <h1 className='font-bold text-2xl text-[#032b41]'>Recommended For You</h1>
                 <p className='mt-3 font-light'>We think you'll like these</p>
+                {
+                    recommendedBooksLoading ? (
+                        <div>Loading</div>
+                    ) : (
+                        <div className='mt-4 flex overflow-x-scroll no-scrollbar w-full'>
+                            {recommendedBooks.map((book) => (
+                                <BookCard key={book.id} book={book} />
+                            ))}
+                        </div>
+                    )
+                }
+            </div>
+            {/*Suggested For You*/}
+            <div className='mt-6'>
+                <h1 className='font-bold text-2xl text-[#032b41]'>Suggsted Books</h1>
+                <p className='mt-3 font-light'>Browse those books</p>
                 {
                     suggestedBooksLoading ? (
                         <div>Loading</div>
