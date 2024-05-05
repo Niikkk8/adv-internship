@@ -1,7 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { CiStar } from 'react-icons/ci';
+import { FaRegClock } from 'react-icons/fa';
 
 interface BookObject {
     id: string;
@@ -22,7 +23,34 @@ interface BookObject {
     authorDescription: string;
 }
 
+const formatTime = (timeInSeconds: number): string => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+
+    const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    return formattedTime;
+};
+
 const BookCard: React.FC<{ book: BookObject }> = ({ book }) => {
+    const [audioDuration, setAudioDuration] = useState<number | null>(null);
+
+    useEffect(() => {
+        if (book && book.audioLink) {
+            fetchAudioDuration(book.audioLink);
+        }
+    }, [book]);
+
+    const fetchAudioDuration = async (audioLink: string) => {
+        try {
+            const audio = new Audio(audioLink);
+            audio.addEventListener('loadedmetadata', () => {
+                setAudioDuration(audio.duration);
+            });
+        } catch (error) {
+            console.error('Error fetching audio duration:', error);
+        }
+    };
+
     return (
         <div className='min-w-[40%] sm:min-w-[25%] lg:min-w-[18%] mx-2 p-2 pb-4 pt-6 hover:bg-[#f1f6f4] rounded-lg'>
             <Link href={`/book/${book.id}`}>
@@ -33,6 +61,8 @@ const BookCard: React.FC<{ book: BookObject }> = ({ book }) => {
                 <p className='flex items-center text-sm text-gray-500 mt-2'>
                     <CiStar />
                     {book.averageRating}
+                    <FaRegClock className='ml-2 mr-1' />
+                    {audioDuration && formatTime(audioDuration)}
                 </p>
             </Link>
         </div>
