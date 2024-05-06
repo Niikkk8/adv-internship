@@ -47,10 +47,10 @@ export default function page() {
         }
     }, [playerId]);
 
-    console.log(book);
     return (
         <div className='max-w-[1200px] mx-auto px-8 py-6'>
-            <p className='whitespace-pre-line'>
+            <h2 className='py-4 border-b text-2xl font-bold text-[#032b41]'>{book?.title}</h2>
+            <p className='whitespace-pre-line py-4'>
                 {book?.summary}
             </p>
         </div>
