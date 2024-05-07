@@ -18,11 +18,12 @@ export default function StoreProvider({ children }: { children: React.ReactNode 
     // const currentPath = router.pathname;
     const isHomePage: boolean = router === "/";
     const isSettingsPage: boolean = router === '/settings';
+    const isChoosePlanPAge: boolean = router === '/choose-plan'
     return (
         <Provider store={storeRef.current}>
-            {!isHomePage && <Sidebar />}
+            {!isHomePage && !isChoosePlanPAge && <Sidebar />}
             <div className="w-full overflow-x-hidden h-screen">
-                {!isSettingsPage && !isHomePage && <SearchBar />}
+                {!isSettingsPage && !isHomePage && !isChoosePlanPAge && <SearchBar />}
                 {children}
             </div>
         </Provider>
