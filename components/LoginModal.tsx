@@ -69,11 +69,13 @@ export default function LoginModal() {
             const user = result.user;
             console.log("Successfully signed in with Google:", user);
             const userDocRef = doc(db, "users", user.uid);
+
             const userDocSnap = await getDoc(userDocRef);
             if (userDocSnap.exists()) {
                 const userData = userDocSnap.data();
                 dispatch(
                     setUser({
+                        userId: userData.userId,
                         userEmail: userData.userEmail,
                         userSubscriptionStatus: userData.userSubscriptionStatus,
                         userSavedBooks: userData.userSavedBooks,
@@ -83,6 +85,7 @@ export default function LoginModal() {
                 console.log("User data fetched from Firestore:", userData);
             } else {
                 await setDoc(userDocRef, {
+                    userId: user.uid,
                     userEmail: user.email,
                     userSubscriptionStatus: null,
                     userSavedBooks: [],
@@ -91,6 +94,7 @@ export default function LoginModal() {
                 console.log("New user added to Firestore");
                 dispatch(
                     setUser({
+                        userId: user.uid,
                         userEmail: user.email,
                         userSubscriptionStatus: null,
                         userSavedBooks: [],
@@ -124,13 +128,34 @@ export default function LoginModal() {
         if (signupFormData.email && signupFormData.password) {
             try {
                 const authResult = await createUserWithEmailAndPassword(auth, signupFormData.email, signupFormData.password);
-                const docRef = await addDoc(collection(db, "users"), {
-                    userEmail: signupFormData.email,
-                    userSubscriptionStatus: null,
-                    userSavedBooks: [],
-                    userFinishedBooks: []
-                });
-                console.log("Document written with ID: ", docRef.id);
+                const user = authResult.user;
+                console.log("User signed up:", user);
+                const userDocRef = doc(db, "users", user.uid);
+    
+                const userDocSnap = await getDoc(userDocRef);
+                if (userDocSnap.exists()) {
+                    console.log("User data already exists in Firestore");
+                } else {
+                    await setDoc(userDocRef, {
+                        userId: user.uid,
+                        userEmail: signupFormData.email,
+                        userSubscriptionStatus: null,
+                        userSavedBooks: [],
+                        userFinishedBooks: []
+                    });
+                    console.log("New user added to Firestore");
+                }
+    
+                dispatch(
+                    setUser({
+                        userId: user.uid,
+                        userEmail: signupFormData.email,
+                        userSubscriptionStatus: null,
+                        userSavedBooks: [],
+                        userFinishedBooks: []
+                    })
+                );
+    
                 setSignupFormData({ email: "", password: "" });
             } catch (error) {
                 console.error("Error creating user or adding document: ", error);
@@ -139,6 +164,7 @@ export default function LoginModal() {
             alert("Please enter both email and password");
         }
     };
+    
 
     return (
         <Modal open={isOpen} onClose={() => dispatch(closeLoginModal())}>
