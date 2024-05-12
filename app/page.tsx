@@ -2,8 +2,9 @@
 import Footer from "@/components/Footer";
 import HomeLanding from "@/components/HomeLanding";
 import HomepageNavbar from "@/components/HomepageNavbar";
-import { useAppDispatch } from "@/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { openLoginModal } from "@/redux/modalSlice";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 // import { openLoginModal } from "@/redux/modalSlice";
 import { AiFillBulb, AiFillStar } from "react-icons/ai";
@@ -31,6 +32,12 @@ export default function Home() {
     const [activeIndex1, setActiveIndex1] = useState<number>(0);
     const [activeIndex2, setActiveIndex2] = useState<number>(0);
     const dispatch = useAppDispatch()
+    const user = useAppSelector((state) => state.user)
+    const router = useRouter()
+
+    if(user.userEmail){
+        router.push('/for-you')
+    }
 
     const featuresData = [
         {

@@ -10,6 +10,7 @@ import { TbUserFilled } from "react-icons/tb";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { addDoc, collection, doc, getDoc, setDoc } from "firebase/firestore";
 import { setUser, signOutUser } from "@/redux/userSlice";
+import { useRouter } from "next/navigation";
 
 export default function LoginModal() {
     const isOpen = useAppSelector((state) => state.modals.loginModal);
