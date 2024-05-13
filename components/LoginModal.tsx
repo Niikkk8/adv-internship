@@ -18,6 +18,7 @@ export default function LoginModal() {
     const [loginFormData, setLoginFormData] = useState({ email: "", password: "" });
     const [signupFormData, setSignupFormData] = useState({ email: "", password: "" });
     const dispatch = useAppDispatch();
+    const router = useRouter()
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -35,6 +36,7 @@ export default function LoginModal() {
                                 userFinishedBooks: userData.userFinishedBooks
                             })
                         );
+                        router.push('/for-you')
                         console.log(userData)
                     } else {
                         console.log("User data not found in Firestore");
@@ -83,6 +85,7 @@ export default function LoginModal() {
                         userFinishedBooks: userData.userFinishedBooks
                     })
                 );
+                dispatch(closeLoginModal())
                 console.log("User data fetched from Firestore:", userData);
             } else {
                 await setDoc(userDocRef, {
@@ -116,6 +119,7 @@ export default function LoginModal() {
                 const user = userCredential.user;
                 console.log("User signed in:", user);
                 setLoginFormData({ email: "", password: "" });
+                dispatch(closeLoginModal())
             } catch (error) {
                 console.error("Error signing in: ", error);
             }
@@ -132,7 +136,7 @@ export default function LoginModal() {
                 const user = authResult.user;
                 console.log("User signed up:", user);
                 const userDocRef = doc(db, "users", user.uid);
-    
+
                 const userDocSnap = await getDoc(userDocRef);
                 if (userDocSnap.exists()) {
                     console.log("User data already exists in Firestore");
@@ -146,7 +150,7 @@ export default function LoginModal() {
                     });
                     console.log("New user added to Firestore");
                 }
-    
+
                 dispatch(
                     setUser({
                         userId: user.uid,
@@ -155,8 +159,8 @@ export default function LoginModal() {
                         userSavedBooks: [],
                         userFinishedBooks: []
                     })
-                );
-    
+                );  
+                dispatch(closeLoginModal())
                 setSignupFormData({ email: "", password: "" });
             } catch (error) {
                 console.error("Error creating user or adding document: ", error);
@@ -165,7 +169,7 @@ export default function LoginModal() {
             alert("Please enter both email and password");
         }
     };
-    
+
 
     return (
         <Modal open={isOpen} onClose={() => dispatch(closeLoginModal())}>
