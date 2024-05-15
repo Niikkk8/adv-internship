@@ -8,7 +8,7 @@ import { CgClose } from "react-icons/cg";
 import { auth, db, provider } from "../firebase";
 import { TbUserFilled } from "react-icons/tb";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { addDoc, collection, doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { setUser, signOutUser } from "@/redux/userSlice";
 import { useRouter } from "next/navigation";
 
