@@ -2,9 +2,13 @@
 import Footer from "@/components/Footer";
 import HomeLanding from "@/components/HomeLanding";
 import HomepageNavbar from "@/components/HomepageNavbar";
+import { auth, db } from "@/firebase";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { openLoginModal } from "@/redux/modalSlice";
-import { useRouter } from "next/navigation";
+import { setUser, signOutUser } from "@/redux/userSlice";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 // import { openLoginModal } from "@/redux/modalSlice";
 import { AiFillBulb, AiFillStar } from "react-icons/ai";
@@ -32,6 +36,7 @@ export default function Home() {
     const [activeIndex1, setActiveIndex1] = useState<number>(0);
     const [activeIndex2, setActiveIndex2] = useState<number>(0);
     const dispatch = useAppDispatch()
+    const router = useRouter()
 
     const featuresData = [
         {
@@ -68,6 +73,37 @@ export default function Home() {
         }, 1500);
         return () => clearInterval(interval);
     }, []);
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const userDocRef = doc(db, "users", user.uid);
+                    const userDocSnap = await getDoc(userDocRef);
+                    if (userDocSnap.exists()) {
+                        const userData = userDocSnap.data();
+                        dispatch(
+                            setUser({
+                                userEmail: userData.userEmail,
+                                userSubscriptionStatus: userData.userSubscriptionStatus,
+                                userSavedBooks: userData.userSavedBooks,
+                                userFinishedBooks: userData.userFinishedBooks
+                            })
+                        );
+                        router.push('/for-you')
+                        console.log(userData)
+                    } else {
+                        console.log("User data not found in Firestore");
+                    }
+                } catch (error) {
+                    console.error("Error fetching user data:", error);
+                }
+            } else {
+                dispatch(signOutUser());
+            }
+        });
+        return () => unsubscribe();
+    }, [dispatch]);
 
     return (
         <>

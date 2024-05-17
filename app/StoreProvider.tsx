@@ -18,19 +18,20 @@ export default function StoreProvider({ children }: { children: React.ReactNode 
     const router = usePathname();
     // const currentPath = router.pathname;
     const isHomePage: boolean = router === "/";
-    const isSettingsPage: boolean = router === '/settings';
+    // const isSettingsPage: boolean = router === '/settings';
     const isChoosePlanPAge: boolean = router === '/choose-plan'
+    const isPlayerPage: boolean = router.includes('/player')
     return (
         <Provider store={storeRef.current}>
-            <div className="max-h-screen overflow-y-scroll no-srollbar flex flex-col">
-                <div className="flex">
+            <div className="max-h-screen flex flex-col">
+                <div className={`flex ${isPlayerPage && 'h-[calc(100vh-120px)]'}`}>
                     {!isHomePage && !isChoosePlanPAge && <Sidebar />}
                     <div className="w-full overflow-x-hidden h-screen">
                         {!isHomePage && !isChoosePlanPAge && <SearchBar />}
                         {children}
                     </div>
                 </div>
-                <AudioPlayer />
+                {isPlayerPage && <AudioPlayer />}
             </div>
         </Provider>
     );

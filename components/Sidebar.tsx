@@ -9,7 +9,7 @@ import { IoHomeOutline, IoSearchOutline, IoSettingsOutline } from 'react-icons/i
 export default function Sidebar() {
     const router = usePathname();
     return (
-        <div className='hidden md:flex flex-col justify-between h-screen border-r bg-[#f7faf9] min-w-fit'>
+        <div className='hidden md:flex flex-col justify-between border-r bg-[#f7faf9] min-w-fit'>
             <div>
                 <div className='p-6'>
                     <img src='/assets/logo.png' className='w-40 h-10' alt='' />

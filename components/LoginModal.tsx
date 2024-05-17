@@ -20,36 +20,36 @@ export default function LoginModal() {
     const dispatch = useAppDispatch();
     const router = useRouter()
 
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                try {
-                    const userDocRef = doc(db, "users", user.uid);
-                    const userDocSnap = await getDoc(userDocRef);
-                    if (userDocSnap.exists()) {
-                        const userData = userDocSnap.data();
-                        dispatch(
-                            setUser({
-                                userEmail: userData.userEmail,
-                                userSubscriptionStatus: userData.userSubscriptionStatus,
-                                userSavedBooks: userData.userSavedBooks,
-                                userFinishedBooks: userData.userFinishedBooks
-                            })
-                        );
-                        router.push('/for-you')
-                        console.log(userData)
-                    } else {
-                        console.log("User data not found in Firestore");
-                    }
-                } catch (error) {
-                    console.error("Error fetching user data:", error);
-                }
-            } else {
-                dispatch(signOutUser());
-            }
-        });
-        return () => unsubscribe();
-    }, [dispatch]);
+    // useEffect(() => {
+    //     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    //         if (user) {
+    //             try {
+    //                 const userDocRef = doc(db, "users", user.uid);
+    //                 const userDocSnap = await getDoc(userDocRef);
+    //                 if (userDocSnap.exists()) {
+    //                     const userData = userDocSnap.data();
+    //                     dispatch(
+    //                         setUser({
+    //                             userEmail: userData.userEmail,
+    //                             userSubscriptionStatus: userData.userSubscriptionStatus,
+    //                             userSavedBooks: userData.userSavedBooks,
+    //                             userFinishedBooks: userData.userFinishedBooks
+    //                         })
+    //                     );
+    //                     // router.push('/for-you')
+    //                     console.log(userData)
+    //                 } else {
+    //                     console.log("User data not found in Firestore");
+    //                 }
+    //             } catch (error) {
+    //                 console.error("Error fetching user data:", error);
+    //             }
+    //         } else {
+    //             dispatch(signOutUser());
+    //         }
+    //     });
+    //     return () => unsubscribe();
+    // }, [dispatch]);
 
     function toggleLogin() {
         setLoginInterface(!loginInterface);
@@ -159,7 +159,7 @@ export default function LoginModal() {
                         userSavedBooks: [],
                         userFinishedBooks: []
                     })
-                );  
+                );
                 dispatch(closeLoginModal())
                 setSignupFormData({ email: "", password: "" });
             } catch (error) {
