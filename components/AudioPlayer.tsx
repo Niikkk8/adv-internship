@@ -1,14 +1,9 @@
 import axios from "axios";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
-import {
-    IoPlayBackSharp,
-    IoPlayForwardSharp,
-    IoPlaySkipBackSharp,
-    IoPlaySkipForwardSharp,
-    IoPlaySharp,
-    IoPauseSharp,
-} from "react-icons/io5";
+import { IoPlaySharp, IoPauseSharp } from "react-icons/io5";
+import { TbRewindBackward10, TbRewindForward10 } from "react-icons/tb";
 
 interface BookObject {
     id: string;
@@ -29,6 +24,12 @@ interface BookObject {
     authorDescription: string;
 }
 
+const formatTime = (timeInSeconds: number): string => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+};
+
 export default function AudioPlayer() {
     const pathname = usePathname();
     const playerId = pathname.split("/").pop();
@@ -48,6 +49,10 @@ export default function AudioPlayer() {
                 );
                 setBook(response.data);
                 setLoading(false);
+
+                if (response.data.audioLink) {
+                    fetchAudioDuration(response.data.audioLink);
+                }
             } catch (error) {
                 console.error("Error fetching data:", error);
                 setLoading(false);
@@ -59,53 +64,16 @@ export default function AudioPlayer() {
         }
     }, [playerId]);
 
-    useEffect(() => {
-        const audio = audioRef.current;
-        const handleTimeUpdate = () => {
-            if (audio) {
-                setCurrentTime(audio.currentTime);
-            }
-        };
-        const handleLoadedMetadata = () => {
-            if (audio) {
+    const fetchAudioDuration = async (audioLink: string) => {
+        try {
+            const audio = new Audio(audioLink);
+            audio.addEventListener('loadedmetadata', () => {
                 setDuration(audio.duration);
-            }
-        };
-        const handleLoadedData = () => {
-            setTimeout(() => {
-                if (audio) {
-                    setCurrentTime(audio.currentTime);
-                }
-            }, 100); // Delay of 100ms to ensure currentTime is accurate
-        };
-        const handleSeeked = () => {
-            setTimeout(() => {
-                if (audio) {
-                    setCurrentTime(audio.currentTime);
-                }
-            }, 100); // Delay of 100ms to ensure currentTime is accurate
-        };
-        const handleAudioEnded = () => {
-            setIsPlaying(false);
-            setCurrentTime(0);
-        };
-        if (audio) {
-            audio.addEventListener("timeupdate", handleTimeUpdate);
-            audio.addEventListener("loadedmetadata", handleLoadedMetadata);
-            audio.addEventListener("loadeddata", handleLoadedData);
-            audio.addEventListener("seeked", handleSeeked);
-            audio.addEventListener("ended", handleAudioEnded);
+            });
+        } catch (error) {
+            console.error('Error fetching audio duration:', error);
         }
-        return () => {
-            if (audio) {
-                audio.removeEventListener("timeupdate", handleTimeUpdate);
-                audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
-                audio.removeEventListener("loadeddata", handleLoadedData);
-                audio.removeEventListener("seeked", handleSeeked);
-                audio.removeEventListener("ended", handleAudioEnded);
-            }
-        };
-    }, []);
+    };
 
     const handlePlayPause = () => {
         if (audioRef.current) {
@@ -119,21 +87,23 @@ export default function AudioPlayer() {
     };
 
     const handleProgressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (audioRef.current && audioRef.current.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        if (audioRef.current) {
             const newTime = Number(e.target.value);
             audioRef.current.currentTime = newTime;
             setCurrentTime(newTime);
         }
     };
 
-    const formatTime = (time: number) => {
-        const minutes = Math.floor(time / 60);
-        const seconds = Math.floor(time % 60);
-        const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
-        if (minutes === 0 && seconds === 0) {
-            return "0:00"; // Handle the case when time is 0 seconds
+    const handleSkipForward = () => {
+        if (audioRef.current) {
+            audioRef.current.currentTime += 10;
         }
-        return `${minutes}:${formattedSeconds}`;
+    };
+
+    const handleSkipBackward = () => {
+        if (audioRef.current) {
+            audioRef.current.currentTime -= 10;
+        }
     };
 
     if (loading) {
@@ -141,20 +111,35 @@ export default function AudioPlayer() {
     }
 
     return (
-        <div className="!h-[120px] bg-[#042330] flex flex-col items-center justify-center">
-            {book && (
-                <>
-                    <audio ref={audioRef} src={book.audioLink} preload="metadata" />
-                    <Controls
-                        isPlaying={isPlaying}
-                        onPlayPause={handlePlayPause}
-                        currentTime={currentTime}
-                        duration={duration}
-                        onProgressChange={handleProgressChange}
-                        formatTime={formatTime}
-                    />
-                </>
-            )}
+        <div className="h-[120px] bg-[#042330] flex items-center justify-center">
+            <div className="flex">
+                <Image src={book?.imageLink || ''} alt="" height={20} width={20} />
+                <div>
+                    <h3>{book?.title}</h3>
+                    <h4>{book?.author}</h4>
+                </div>
+            </div>
+            <div>
+                <audio
+                    ref={audioRef}
+                    src={book?.audioLink}
+                    preload="metadata"
+                    onTimeUpdate={() => setCurrentTime(audioRef.current?.currentTime || 0)}
+                    onEnded={() => setIsPlaying(false)}
+                />
+                <Controls
+                    isPlaying={isPlaying}
+                    onPlayPause={handlePlayPause}
+                    onSkipForward={handleSkipForward}
+                    onSkipBackward={handleSkipBackward}
+                />
+            </div>
+            <ProgressBar
+                currentTime={currentTime}
+                duration={duration}
+                onProgressChange={handleProgressChange}
+                formatTime={formatTime}
+            />
         </div>
     );
 }
@@ -162,51 +147,56 @@ export default function AudioPlayer() {
 interface ControlsProps {
     isPlaying: boolean;
     onPlayPause: () => void;
+    onSkipForward: () => void;
+    onSkipBackward: () => void;
+}
+
+const Controls: React.FC<ControlsProps> = ({
+    isPlaying,
+    onPlayPause,
+    onSkipForward,
+    onSkipBackward,
+}) => {
+    return (
+        <div className="controls-wrapper flex items-center mb-2">
+            <button className="p-2" onClick={onSkipBackward}>
+                <TbRewindBackward10 />
+            </button>
+            <button className="p-2" onClick={onPlayPause}>
+                {isPlaying ? <IoPauseSharp /> : <IoPlaySharp />}
+            </button>
+            <button className="p-2" onClick={onSkipForward}>
+                <TbRewindForward10 />
+            </button>
+        </div>
+    );
+};
+
+interface ProgressBarProps {
     currentTime: number;
     duration: number;
     onProgressChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     formatTime: (time: number) => string;
 }
 
-const Controls: React.FC<ControlsProps> = ({
-    isPlaying,
-    onPlayPause,
+const ProgressBar: React.FC<ProgressBarProps> = ({
     currentTime,
     duration,
     onProgressChange,
     formatTime,
 }) => {
     return (
-        <div className="controls-wrapper flex flex-col items-center">
-            <div className="controls flex items-center mb-2">
-                <button className="p-2">
-                    <IoPlaySkipBackSharp />
-                </button>
-                <button className="p-2">
-                    <IoPlayBackSharp />
-                </button>
-                <button className="p-2" onClick={onPlayPause}>
-                    {isPlaying ? <IoPauseSharp /> : <IoPlaySharp />}
-                </button>
-                <button className="p-2">
-                    <IoPlayForwardSharp />
-                </button>
-                <button className="p-2">
-                    <IoPlaySkipForwardSharp />
-                </button>
-            </div>
-            <div className="w-full flex items-center">
-                <span className="text-white">{formatTime(currentTime)}</span>
-                <input
-                    type="range"
-                    min="0"
-                    max={duration}
-                    value={currentTime}
-                    onChange={onProgressChange}
-                    className="mx-2 flex-1"
-                />
-                <span className="text-white">{formatTime(duration)}</span>
-            </div>
+        <div className="progress-bar-wrapper w-[20%] flex items-center">
+            <span className="text-white">{formatTime(currentTime)}</span>
+            <input
+                type="range"
+                min={0}
+                max={duration || 0}
+                value={currentTime}
+                onChange={onProgressChange}
+                className="mx-2 flex-1"
+            />
+            <span className="text-white">{formatTime(duration)}</span>
         </div>
     );
 };
