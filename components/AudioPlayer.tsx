@@ -111,15 +111,16 @@ export default function AudioPlayer() {
     }
 
     return (
-        <div className="h-[120px] bg-[#042330] flex items-center justify-center">
-            <div className="flex">
-                <Image src={book?.imageLink || ''} alt="" height={20} width={20} />
-                <div>
-                    <h3>{book?.title}</h3>
-                    <h4>{book?.author}</h4>
+        <div className="h-[160px] bg-[#042330]">
+            <div className="max-w-[1400px] mx-auto h-full flex flex-col md:flex-row items-center justify-between px-4">
+                <div className="flex items-center w-[80%] md:w-[30%]">
+                    <Image src={book?.imageLink || ''} alt="" height={60} width={60} className="py-2" />
+                    <div className="ml-2">
+                        <h3 className="text-md text-white">{book?.title}</h3>
+                        <h4 className="text-sm text-gray-300">{book?.author}</h4>
+                    </div>
                 </div>
-            </div>
-            <div>
+                {/* <div className="flex justify-around w-[50%]"> */}
                 <audio
                     ref={audioRef}
                     src={book?.audioLink}
@@ -133,13 +134,14 @@ export default function AudioPlayer() {
                     onSkipForward={handleSkipForward}
                     onSkipBackward={handleSkipBackward}
                 />
+                {/* </div> */}
+                <ProgressBar
+                    currentTime={currentTime}
+                    duration={duration}
+                    onProgressChange={handleProgressChange}
+                    formatTime={formatTime}
+                />
             </div>
-            <ProgressBar
-                currentTime={currentTime}
-                duration={duration}
-                onProgressChange={handleProgressChange}
-                formatTime={formatTime}
-            />
         </div>
     );
 }
@@ -158,15 +160,15 @@ const Controls: React.FC<ControlsProps> = ({
     onSkipBackward,
 }) => {
     return (
-        <div className="controls-wrapper flex items-center mb-2">
+        <div className="flex justify-center items-center mb-2 text-white w-[80%] md:w-[30%]">
             <button className="p-2" onClick={onSkipBackward}>
-                <TbRewindBackward10 />
+                <TbRewindBackward10 size={24} />
             </button>
             <button className="p-2" onClick={onPlayPause}>
-                {isPlaying ? <IoPauseSharp /> : <IoPlaySharp />}
+                {isPlaying ? <IoPauseSharp size={28} /> : <IoPlaySharp size={28} />}
             </button>
             <button className="p-2" onClick={onSkipForward}>
-                <TbRewindForward10 />
+                <TbRewindForward10 size={24} />
             </button>
         </div>
     );
@@ -186,7 +188,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
     formatTime,
 }) => {
     return (
-        <div className="progress-bar-wrapper w-[20%] flex items-center">
+        <div className="flex items-center w-[60%] md:w-[30%]">
             <span className="text-white">{formatTime(currentTime)}</span>
             <input
                 type="range"

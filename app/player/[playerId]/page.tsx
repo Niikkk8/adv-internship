@@ -49,7 +49,7 @@ export default function page() {
     }, [playerId]);
 
     return (
-        <div className='max-w-[1200px] mx-auto px-8 py-6 pb-20 h-[calc(100vh-120px)] overflow-y-scroll no-scrollbar'>
+        <div className='max-w-[1200px] mx-auto px-8 py-6 pb-20 h-[calc(100vh-160px)] md:h-[calc(100vh-120px)] overflow-y-scroll no-scrollbar'>
             <h2 className='py-4 border-b text-2xl font-bold text-[#032b41]'>{book?.title}</h2>
             <p className='whitespace-pre-line py-4'>
                 {book?.summary}

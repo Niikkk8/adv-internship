@@ -24,7 +24,7 @@ export default function StoreProvider({ children }: { children: React.ReactNode 
     return (
         <Provider store={storeRef.current}>
             <div className="max-h-screen flex flex-col">
-                <div className={`flex ${isPlayerPage && 'h-[calc(100vh-120px)]'}`}>
+                <div className={`flex ${isPlayerPage && 'h-[calc(100vh-160px)] md:h-[calc(100vh-120px)]'}`}>
                     {!isHomePage && !isChoosePlanPAge && <Sidebar />}
                     <div className="w-full overflow-x-hidden h-screen">
                         {!isHomePage && !isChoosePlanPAge && <SearchBar />}
