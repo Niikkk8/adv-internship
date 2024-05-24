@@ -105,6 +105,7 @@ export default function LoginModal() {
                         userFinishedBooks: []
                     })
                 );
+                router.push('/for-you')
             }
         } catch (error) {
             console.error("Error signing in with Google:", error);
@@ -120,6 +121,8 @@ export default function LoginModal() {
                 console.log("User signed in:", user);
                 setLoginFormData({ email: "", password: "" });
                 dispatch(closeLoginModal())
+                router.push('/for-you')
+
             } catch (error) {
                 console.error("Error signing in: ", error);
             }
@@ -162,6 +165,7 @@ export default function LoginModal() {
                 );
                 dispatch(closeLoginModal())
                 setSignupFormData({ email: "", password: "" });
+                router.push('/for-you')
             } catch (error) {
                 console.error("Error creating user or adding document: ", error);
             }

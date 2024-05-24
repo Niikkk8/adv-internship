@@ -28,7 +28,6 @@ export default function page() {
     const playerId = pathname.split('/').pop();
     const [loading, setLoading] = useState<boolean>(true);
     const [book, setBook] = useState<BookObject | undefined>();
-    console.log(pathname)
 
     useEffect(() => {
         const fetchSelectedBook = async () => {

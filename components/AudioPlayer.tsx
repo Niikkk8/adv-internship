@@ -113,11 +113,11 @@ export default function AudioPlayer() {
     return (
         <div className="h-[160px] bg-[#042330]">
             <div className="max-w-[1400px] mx-auto h-full flex flex-col md:flex-row items-center justify-between px-4">
-                <div className="flex items-center w-[80%] md:w-[30%]">
+                <div className="flex items-center justify-center w-[80%] md:w-[30%]">
                     <Image src={book?.imageLink || ''} alt="" height={60} width={60} className="py-2" />
                     <div className="ml-2">
-                        <h3 className="text-md text-white">{book?.title}</h3>
-                        <h4 className="text-sm text-gray-300">{book?.author}</h4>
+                        <h3 className="text-sm md:text-md text-white">{book?.title}</h3>
+                        <h4 className="text-xs md:text-sm text-gray-300">{book?.author}</h4>
                     </div>
                 </div>
                 {/* <div className="flex justify-around w-[50%]"> */}
