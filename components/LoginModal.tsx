@@ -2,7 +2,7 @@
 
 import { closeLoginModal } from "@/redux/modalSlice";
 import { Modal } from "@mui/material";
-import { signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { signInWithPopup, signInWithRedirect, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import { CgClose } from "react-icons/cg";
 import { auth, db, provider } from "../firebase";
@@ -12,44 +12,17 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { setUser, signOutUser } from "@/redux/userSlice";
 import { useRouter } from "next/navigation";
 
+const isMobileDevice = () => {
+    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+};
+
 export default function LoginModal() {
     const isOpen = useAppSelector((state) => state.modals.loginModal);
     const [loginInterface, setLoginInterface] = useState<boolean>(true);
     const [loginFormData, setLoginFormData] = useState({ email: "", password: "" });
     const [signupFormData, setSignupFormData] = useState({ email: "", password: "" });
     const dispatch = useAppDispatch();
-    const router = useRouter()
-
-    // useEffect(() => {
-    //     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-    //         if (user) {
-    //             try {
-    //                 const userDocRef = doc(db, "users", user.uid);
-    //                 const userDocSnap = await getDoc(userDocRef);
-    //                 if (userDocSnap.exists()) {
-    //                     const userData = userDocSnap.data();
-    //                     dispatch(
-    //                         setUser({
-    //                             userEmail: userData.userEmail,
-    //                             userSubscriptionStatus: userData.userSubscriptionStatus,
-    //                             userSavedBooks: userData.userSavedBooks,
-    //                             userFinishedBooks: userData.userFinishedBooks
-    //                         })
-    //                     );
-    //                     // router.push('/for-you')
-    //                     console.log(userData)
-    //                 } else {
-    //                     console.log("User data not found in Firestore");
-    //                 }
-    //             } catch (error) {
-    //                 console.error("Error fetching user data:", error);
-    //             }
-    //         } else {
-    //             dispatch(signOutUser());
-    //         }
-    //     });
-    //     return () => unsubscribe();
-    // }, [dispatch]);
+    const router = useRouter();
 
     function toggleLogin() {
         setLoginInterface(!loginInterface);
@@ -68,49 +41,56 @@ export default function LoginModal() {
     async function handleSignInWithGoogle(e: React.MouseEvent<HTMLButtonElement>) {
         e.preventDefault();
         try {
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
-            console.log("Successfully signed in with Google:", user);
-            const userDocRef = doc(db, "users", user.uid);
-
-            const userDocSnap = await getDoc(userDocRef);
-            if (userDocSnap.exists()) {
-                const userData = userDocSnap.data();
-                dispatch(
-                    setUser({
-                        userId: userData.userId,
-                        userEmail: userData.userEmail,
-                        userSubscriptionStatus: userData.userSubscriptionStatus,
-                        userSavedBooks: userData.userSavedBooks,
-                        userFinishedBooks: userData.userFinishedBooks
-                    })
-                );
-                dispatch(closeLoginModal())
-                console.log("User data fetched from Firestore:", userData);
+            if (isMobileDevice()) {
+                await signInWithRedirect(auth, provider);
             } else {
-                await setDoc(userDocRef, {
-                    userId: user.uid,
-                    userEmail: user.email,
-                    userSubscriptionStatus: null,
-                    userSavedBooks: [],
-                    userFinishedBooks: []
-                });
-                console.log("New user added to Firestore");
-                dispatch(
-                    setUser({
-                        userId: user.uid,
-                        userEmail: user.email,
-                        userSubscriptionStatus: null,
-                        userSavedBooks: [],
-                        userFinishedBooks: []
-                    })
-                );
-                router.push('/for-you')
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                console.log("Successfully signed in with Google:", user);
+                await handleUserAuthentication(user);
             }
         } catch (error) {
             console.error("Error signing in with Google:", error);
         }
     }
+
+    const handleUserAuthentication = async (user: any) => {
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        if (userDocSnap.exists()) {
+            const userData = userDocSnap.data();
+            dispatch(
+                setUser({
+                    userId: userData.userId,
+                    userEmail: userData.userEmail,
+                    userSubscriptionStatus: userData.userSubscriptionStatus,
+                    userSavedBooks: userData.userSavedBooks,
+                    userFinishedBooks: userData.userFinishedBooks
+                })
+            );
+            dispatch(closeLoginModal());
+            console.log("User data fetched from Firestore:", userData);
+        } else {
+            await setDoc(userDocRef, {
+                userId: user.uid,
+                userEmail: user.email,
+                userSubscriptionStatus: null,
+                userSavedBooks: [],
+                userFinishedBooks: []
+            });
+            console.log("New user added to Firestore");
+            dispatch(
+                setUser({
+                    userId: user.uid,
+                    userEmail: user.email,
+                    userSubscriptionStatus: null,
+                    userSavedBooks: [],
+                    userFinishedBooks: []
+                })
+            );
+            router.push('/for-you');
+        }
+    };
 
     const handleLoginSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -120,9 +100,8 @@ export default function LoginModal() {
                 const user = userCredential.user;
                 console.log("User signed in:", user);
                 setLoginFormData({ email: "", password: "" });
-                dispatch(closeLoginModal())
-                router.push('/for-you')
-
+                dispatch(closeLoginModal());
+                router.push('/for-you');
             } catch (error) {
                 console.error("Error signing in: ", error);
             }
@@ -139,21 +118,14 @@ export default function LoginModal() {
                 const user = authResult.user;
                 console.log("User signed up:", user);
                 const userDocRef = doc(db, "users", user.uid);
-
-                const userDocSnap = await getDoc(userDocRef);
-                if (userDocSnap.exists()) {
-                    console.log("User data already exists in Firestore");
-                } else {
-                    await setDoc(userDocRef, {
-                        userId: user.uid,
-                        userEmail: signupFormData.email,
-                        userSubscriptionStatus: null,
-                        userSavedBooks: [],
-                        userFinishedBooks: []
-                    });
-                    console.log("New user added to Firestore");
-                }
-
+                await setDoc(userDocRef, {
+                    userId: user.uid,
+                    userEmail: signupFormData.email,
+                    userSubscriptionStatus: null,
+                    userSavedBooks: [],
+                    userFinishedBooks: []
+                });
+                console.log("New user added to Firestore");
                 dispatch(
                     setUser({
                         userId: user.uid,
@@ -163,9 +135,9 @@ export default function LoginModal() {
                         userFinishedBooks: []
                     })
                 );
-                dispatch(closeLoginModal())
+                dispatch(closeLoginModal());
                 setSignupFormData({ email: "", password: "" });
-                router.push('/for-you')
+                router.push('/for-you');
             } catch (error) {
                 console.error("Error creating user or adding document: ", error);
             }
@@ -173,7 +145,6 @@ export default function LoginModal() {
             alert("Please enter both email and password");
         }
     };
-
 
     return (
         <Modal open={isOpen} onClose={() => dispatch(closeLoginModal())}>

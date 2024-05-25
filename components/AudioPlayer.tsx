@@ -196,7 +196,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
                 max={duration || 0}
                 value={currentTime}
                 onChange={onProgressChange}
-                className="mx-2 flex-1"
+                className="mx-2 flex-1 accent-summarist-green"
             />
             <span className="text-white">{formatTime(duration)}</span>
         </div>
