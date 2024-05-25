@@ -74,37 +74,6 @@ export default function Home() {
         return () => clearInterval(interval);
     }, []);
 
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                try {
-                    const userDocRef = doc(db, "users", user.uid);
-                    const userDocSnap = await getDoc(userDocRef);
-                    if (userDocSnap.exists()) {
-                        const userData = userDocSnap.data();
-                        dispatch(
-                            setUser({
-                                userEmail: userData.userEmail,
-                                userSubscriptionStatus: userData.userSubscriptionStatus,
-                                userSavedBooks: userData.userSavedBooks,
-                                userFinishedBooks: userData.userFinishedBooks
-                            })
-                        );
-                        router.push('/for-you')
-                        console.log(userData)
-                    } else {
-                        console.log("User data not found in Firestore");
-                    }
-                } catch (error) {
-                    console.error("Error fetching user data:", error);
-                }
-            } else {
-                dispatch(signOutUser());
-            }
-        });
-        return () => unsubscribe();
-    }, [dispatch]);
-
     return (
         <>
             <div className="max-w-[1000px] m-auto px-4">

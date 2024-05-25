@@ -3,6 +3,7 @@
 import BookCard from '@/components/BookCard';
 import axios from 'axios';
 import Image from 'next/image';
+import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
 interface BookObject {
@@ -73,24 +74,26 @@ export default function Page() {
             {/* Selected for you */}
             <div className='mt-2'>
                 <h1 className='font-bold text-2xl text-[#032b41]'>Selected just for you</h1>
-                <div className='bg-[#fbefd6] mt-4 flex flex-col md:flex-row p-4 w-full lg:w-[60%]'>
-                    {selectedBookLoading ?
-                        <div>Loading</div>
-                        :
-                        <>
-                            <p className='text-sm md:w-[40%] px-4 py-2'>{selectedBook?.subTitle}</p>
-                            <div className='flex md:border-l border-gray-500 pl-4'>
-                                {selectedBook?.imageLink &&
-                                    <Image src={selectedBook?.imageLink} width={160} height={160} alt='Selected Book Image' />
-                                }
-                                <div className='ml-2'>
-                                    <h2 className='font-bold'>{selectedBook?.title}</h2>
-                                    <p className='text-sm'>{selectedBook?.author}</p>
+                <Link href={`/book/${selectedBook?.id}`}>
+                    <div className='bg-[#fbefd6] mt-4 flex flex-col md:flex-row p-4 w-full lg:w-[60%]'>
+                        {selectedBookLoading ?
+                            <div>Loading</div>
+                            :
+                            <>
+                                <p className='text-sm md:w-[40%] px-4 py-2'>{selectedBook?.subTitle}</p>
+                                <div className='flex md:border-l border-gray-500 pl-4'>
+                                    {selectedBook?.imageLink &&
+                                        <Image src={selectedBook?.imageLink} width={160} height={160} alt='Selected Book Image' />
+                                    }
+                                    <div className='ml-2'>
+                                        <h2 className='font-bold'>{selectedBook?.title}</h2>
+                                        <p className='text-sm'>{selectedBook?.author}</p>
+                                    </div>
                                 </div>
-                            </div>
-                        </>
-                    }
-                </div>
+                            </>
+                        }
+                    </div>
+                </Link>
             </div>
             {/*Recommended for you*/}
             <div className='mt-6'>

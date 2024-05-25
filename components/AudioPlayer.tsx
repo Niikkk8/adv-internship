@@ -1,4 +1,8 @@
+import { db } from "@/firebase";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { setUser } from "@/redux/userSlice";
 import axios from "axios";
+import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
@@ -24,6 +28,14 @@ interface BookObject {
     authorDescription: string;
 }
 
+interface UserState {
+    userId: string | null;
+    userEmail: string | null;
+    userSubscriptionStatus: string | null;
+    userSavedBooks: string[];
+    userFinishedBooks: string[];
+}
+
 const formatTime = (timeInSeconds: number): string => {
     const minutes = Math.floor(timeInSeconds / 60);
     const seconds = Math.floor(timeInSeconds % 60);
@@ -32,7 +44,7 @@ const formatTime = (timeInSeconds: number): string => {
 
 export default function AudioPlayer() {
     const pathname = usePathname();
-    const playerId = pathname.split("/").pop();
+    const playerId: string = pathname.split("/").pop() || "";
     const [book, setBook] = useState<BookObject | undefined>();
     const [loading, setLoading] = useState<boolean>(true);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -120,7 +132,6 @@ export default function AudioPlayer() {
                         <h4 className="text-xs md:text-sm text-gray-300">{book?.author}</h4>
                     </div>
                 </div>
-                {/* <div className="flex justify-around w-[50%]"> */}
                 <audio
                     ref={audioRef}
                     src={book?.audioLink}
@@ -134,12 +145,12 @@ export default function AudioPlayer() {
                     onSkipForward={handleSkipForward}
                     onSkipBackward={handleSkipBackward}
                 />
-                {/* </div> */}
                 <ProgressBar
                     currentTime={currentTime}
                     duration={duration}
                     onProgressChange={handleProgressChange}
                     formatTime={formatTime}
+                    playerId={playerId}
                 />
             </div>
         </div>
@@ -179,6 +190,7 @@ interface ProgressBarProps {
     duration: number;
     onProgressChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     formatTime: (time: number) => string;
+    playerId: string;
 }
 
 const ProgressBar: React.FC<ProgressBarProps> = ({
@@ -186,7 +198,32 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
     duration,
     onProgressChange,
     formatTime,
+    playerId,
 }) => {
+    const user = useAppSelector((state: { user: UserState }) => state.user);
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        const updateFinishedBooks = async () => {
+            try {
+                const userDocRef = doc(db, "users", user.userId!);
+                await updateDoc(userDocRef, {
+                    userFinishedBooks: arrayUnion(playerId)
+                });
+                dispatch(setUser({
+                    ...user,
+                    userFinishedBooks: [...user.userFinishedBooks, playerId]
+                }));
+            } catch (error) {
+                console.error("Error updating user finished books:", error);
+            }
+        };
+
+        if (Math.floor(currentTime) === Math.floor(duration) && !user.userFinishedBooks.includes(playerId)) {
+            updateFinishedBooks();
+        }
+    }, [currentTime, duration, playerId, user, dispatch]);
+
     return (
         <div className="flex items-center w-[60%] md:w-[30%]">
             <span className="text-white">{formatTime(currentTime)}</span>

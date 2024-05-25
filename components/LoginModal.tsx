@@ -10,7 +10,7 @@ import { TbUserFilled } from "react-icons/tb";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { setUser, signOutUser } from "@/redux/userSlice";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const isMobileDevice = () => {
     return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -23,6 +23,7 @@ export default function LoginModal() {
     const [signupFormData, setSignupFormData] = useState({ email: "", password: "" });
     const dispatch = useAppDispatch();
     const router = useRouter();
+    const pathname = usePathname()
 
     function toggleLogin() {
         setLoginInterface(!loginInterface);
@@ -32,6 +33,39 @@ export default function LoginModal() {
         const { name, value } = e.target;
         setLoginFormData({ ...loginFormData, [name]: value });
     };
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const userDocRef = doc(db, "users", user.uid);
+                    const userDocSnap = await getDoc(userDocRef);
+                    if (userDocSnap.exists()) {
+                        const userData = userDocSnap.data();
+                        dispatch(
+                            setUser({
+                                userEmail: userData.userEmail,
+                                userSubscriptionStatus: userData.userSubscriptionStatus,
+                                userSavedBooks: userData.userSavedBooks,
+                                userFinishedBooks: userData.userFinishedBooks,
+                                userId: userData.userId
+                            })
+                        );
+                        if (pathname === '/') {
+                            router.push('/for-you')
+                        }
+                    } else {
+                        console.log("User data not found in Firestore");
+                    }
+                } catch (error) {
+                    console.error("Error fetching user data:", error);
+                }
+            } else {
+                dispatch(signOutUser());
+            }
+        });
+        return () => unsubscribe();
+    }, [dispatch]);
 
     const handleSignupInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
