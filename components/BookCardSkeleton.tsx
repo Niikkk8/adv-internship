@@ -4,7 +4,7 @@ import React from 'react'
 export default function BookCardSkeleton() {
     return (
         <div className='min-w-[40%] sm:min-w-[25%] lg:min-w-[18%] mx-2 p-2 pb-4 pt-6 hover:bg-[#f1f6f4] rounded-lg'>
-            <Skeleton variant='rectangular' width={140} height={160} animation="wave" />
+            <Skeleton variant='rectangular' className='w-full' height={180} animation="wave" />
             <Skeleton sx={{ fontSize: '24px' }} />
             <Skeleton sx={{ fontSize: '14px' }} className='w-[50%]' />
             <Skeleton sx={{ fontSize: '18px' }} />
