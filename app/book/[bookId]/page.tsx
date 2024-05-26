@@ -5,11 +5,15 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { CiStar } from 'react-icons/ci';
-import { FaRegBookmark, FaRegClock } from 'react-icons/fa';
+import { FaBookmark, FaRegBookmark, FaRegClock } from 'react-icons/fa';
 import { HiOutlineLightBulb } from 'react-icons/hi';
 import { IoMicOutline } from 'react-icons/io5';
 import { VscBook } from 'react-icons/vsc';
 import Link from 'next/link';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { arrayRemove, arrayUnion, doc, updateDoc } from 'firebase/firestore';
+import { setUser } from '@/redux/userSlice';
+import { db } from '@/firebase';
 
 interface BookObject {
     id: string;
@@ -30,6 +34,14 @@ interface BookObject {
     authorDescription: string;
 }
 
+interface UserState {
+    userId: string | null;
+    userEmail: string | null;
+    userSubscriptionStatus: string | null;
+    userSavedBooks: string[];
+    userFinishedBooks: string[];
+}
+
 const formatTime = (timeInSeconds: number): string => {
     const minutes = Math.floor(timeInSeconds / 60);
     const seconds = Math.floor(timeInSeconds % 60);
@@ -39,11 +51,16 @@ const formatTime = (timeInSeconds: number): string => {
 };
 
 export default function Page() {
+    const user = useAppSelector((state: { user: UserState }) => state.user);
+    const dispatch = useAppDispatch()
     const pathname = usePathname();
     const bookId = pathname.split('/').pop();
     const [loading, setLoading] = useState<boolean>(true);
     const [book, setBook] = useState<BookObject | undefined>();
     const [audioDuration, setAudioDuration] = useState<number | null>(null);
+    const [isInLibrary, setIsInLibrary] = useState<boolean>(
+        user.userSavedBooks.includes(bookId || "")
+    );
 
     useEffect(() => {
         const fetchSelectedBook = async () => {
@@ -79,13 +96,47 @@ export default function Page() {
             console.error('Error fetching audio duration:', error);
         }
     };
-    
+
     if (loading || audioDuration === null) {
         return (
             <div className='max-w-[1200px] mx-auto px-8 py-6'>
                 <div>Loading...</div>
             </div>
         )
+    }
+
+    const removeFromLibrary = async () => {
+        try {
+            const userDocRef = doc(db, "users", user.userId!);
+            await updateDoc(userDocRef, {
+                userSavedBooks: arrayRemove(bookId),
+            });
+            dispatch(
+                setUser({
+                    ...user,
+                    userSavedBooks: user.userSavedBooks.filter((id) => id !== bookId),
+                })
+            );
+            setIsInLibrary(false)
+        } catch (error) {
+            console.error("Error updating user saved books:", error);
+        }
+    }
+
+    const addToLibrary = async () => {
+        try {
+            const userDocRef = doc(db, "users", user.userId!);
+            await updateDoc(userDocRef, {
+                userSavedBooks: arrayUnion(bookId)
+            });
+            dispatch(setUser({
+                ...user,
+                userSavedBooks: [...user.userSavedBooks, bookId]
+            }));
+            setIsInLibrary(true)
+        } catch (error) {
+            console.error("Error updating user saved books:", error);
+        }
     }
 
     return (
@@ -124,7 +175,15 @@ export default function Page() {
                             <Link href={`/player/${book?.id}`} className='flex items-center mr-6 py-3 px-8 bg-[#032b41] text-white rounded-md'> <VscBook className='mr-2' size={22} /> Read </Link>
                             <Link href={`/player/${book?.id}`} className='flex items-center mr-6 py-3 px-8 bg-[#032b41] text-white rounded-md'> <IoMicOutline className='mr-2' size={22} /> Listen </Link>
                         </div>
-                        <button className='flex items-center text-[#0365f2] font-medium text-lg mb-8'> <FaRegBookmark className='mr-3' size={24} /> Add title to my library</button>
+                        {isInLibrary ?
+                            <button className='flex items-center text-[#0365f2] font-medium text-lg mb-8' onClick={removeFromLibrary}>
+                                <FaBookmark className='mr-3' size={24} /> Saved In My Library
+                            </button>
+                            :
+                            <button className='flex items-center text-[#0365f2] font-medium text-lg mb-8' onClick={addToLibrary}>
+                                <FaRegBookmark className='mr-3' size={24} /> Add title to my library
+                            </button>
+                        }
                     </div>
                     <div>
                         <h3 className='text-lg font-semibold text-[#032b41] mb-4'>What's it about?</h3>
