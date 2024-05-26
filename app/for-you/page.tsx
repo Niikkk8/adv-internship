@@ -1,6 +1,8 @@
 "use client"
 
 import BookCard from '@/components/BookCard';
+import BookCardSkeleton from '@/components/BookCardSkeleton';
+import { Skeleton } from '@mui/material';
 import axios from 'axios';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -77,7 +79,18 @@ export default function Page() {
                 <Link href={`/book/${selectedBook?.id}`}>
                     <div className='bg-[#fbefd6] mt-4 flex flex-col md:flex-row p-4 w-full lg:w-[60%]'>
                         {selectedBookLoading ?
-                            <div>Loading</div>
+                            <>
+                                <div className='md:w-[40%] px-4 py-2 mr-2'>
+                                    <Skeleton sx={{ fontSize: '24px' }} />
+                                </div>
+                                <div className='flex md:border-l border-gray-500 pl-4 w-full'>
+                                    <Skeleton variant='rectangular' width={140} height={160} animation="wave" />
+                                    <div className='ml-2 w-[50%]'>
+                                        <Skeleton sx={{ fontSize: '24px' }} />
+                                        <Skeleton sx={{ fontSize: '18px' }} />
+                                    </div>
+                                </div>
+                            </>
                             :
                             <>
                                 <p className='text-sm md:w-[40%] px-4 py-2'>{selectedBook?.subTitle}</p>
@@ -101,7 +114,13 @@ export default function Page() {
                 <p className='mt-3 font-light'>We think you'll like these</p>
                 {
                     recommendedBooksLoading ? (
-                        <div>Loading</div>
+                        <div className='mt-4 flex overflow-x-scroll no-scrollbar w-full'>
+                            {
+                                new Array(6).fill(0).map((_) => (
+                                    <BookCardSkeleton />
+                                ))
+                            }
+                        </div>
                     ) : (
                         <div className='mt-4 flex overflow-x-scroll no-scrollbar w-full'>
                             {recommendedBooks.map((book) => (
@@ -117,7 +136,13 @@ export default function Page() {
                 <p className='mt-3 font-light'>Browse those books</p>
                 {
                     suggestedBooksLoading ? (
-                        <div>Loading</div>
+                        <div className='mt-4 flex overflow-x-scroll no-scrollbar w-full'>
+                            {
+                                new Array(6).fill(0).map((_) => (
+                                    <BookCardSkeleton />
+                                ))
+                            }
+                        </div>
                     ) : (
                         <div className='mt-4 flex overflow-x-scroll no-scrollbar w-full'>
                             {suggestedBooks.map((book) => (
