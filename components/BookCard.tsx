@@ -52,7 +52,7 @@ const BookCard: React.FC<{ book: BookObject }> = ({ book }) => {
     };
 
     return (
-        <div className='min-w-[40%] sm:min-w-[25%] lg:min-w-[18%] mx-2 p-2 pb-4 pt-6 hover:bg-[#f1f6f4] rounded-lg'>
+        <div className='min-w-[40%] max-w-[40%] sm:min-w-[25%] sm:max-w-[30%] lg:min-w-[18%] lg:max-w-[20%] mx-2 p-2 pb-4 pt-6 hover:bg-[#f1f6f4] rounded-lg'>
             <Link href={`/book/${book.id}`}>
                 <Image src={book.imageLink} height={180} width={180} alt='' />
                 <h2 className='font-bold mt-2'>{book.title}</h2>

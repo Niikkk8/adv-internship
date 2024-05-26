@@ -12,10 +12,11 @@ export default function Sidebar() {
     const router = usePathname();
     const dispatch = useAppDispatch();
     const isOpen = useAppSelector((state) => state.sidebar.isOpen);
+    const isPlayerPage = router.includes('/player')
 
     return (
         <div
-            className={`fixed h-screen min-w-fit z-30 md:relative md:flex md:z-auto flex-col justify-between border-r bg-[#f7faf9] w-fit transform transition-transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
+            className={`fixed h-screen ${isPlayerPage && 'h-[calc(100vh-160px)] md:h-[calc(100vh-120px)]'} min-w-fit z-30 md:relative md:flex md:z-auto flex-col justify-between border-r bg-[#f7faf9] w-fit transform transition-transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
         >
             <div className="flex flex-col h-full justify-between">
                 <div>

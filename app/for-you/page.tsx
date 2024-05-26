@@ -116,8 +116,8 @@ export default function Page() {
                     recommendedBooksLoading ? (
                         <div className='mt-4 flex overflow-x-scroll no-scrollbar w-full'>
                             {
-                                new Array(6).fill(0).map((_) => (
-                                    <BookCardSkeleton />
+                                new Array(6).fill(0).map((_, index) => (
+                                    <BookCardSkeleton key={index} />
                                 ))
                             }
                         </div>
@@ -138,8 +138,8 @@ export default function Page() {
                     suggestedBooksLoading ? (
                         <div className='mt-4 flex overflow-x-scroll no-scrollbar w-full'>
                             {
-                                new Array(6).fill(0).map((_) => (
-                                    <BookCardSkeleton />
+                                new Array(6).fill(0).map((_, index) => (
+                                    <BookCardSkeleton key={index} />
                                 ))
                             }
                         </div>

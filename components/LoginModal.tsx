@@ -4,7 +4,6 @@ import { closeLoginModal } from "@/redux/modalSlice";
 import { Modal } from "@mui/material";
 import {
     signInWithPopup,
-    signInWithRedirect,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     onAuthStateChanged,
@@ -17,10 +16,6 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { setUser, signOutUser } from "@/redux/userSlice";
 import { usePathname, useRouter } from "next/navigation";
-
-const isMobileDevice = () => {
-    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-};
 
 export default function LoginModal() {
     const isOpen = useAppSelector((state) => state.modals.loginModal);
@@ -72,8 +67,9 @@ export default function LoginModal() {
                 dispatch(signOutUser());
             }
         });
+
         return () => unsubscribe();
-    }, [dispatch]);
+    }, [dispatch, pathname, router]);
 
     const handleSignupInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -83,54 +79,55 @@ export default function LoginModal() {
     async function handleSignInWithGoogle(e: React.MouseEvent<HTMLButtonElement>) {
         e.preventDefault();
         try {
-            if (isMobileDevice()) {
-                await signInWithRedirect(auth, provider);
-            } else {
+                console.log("Using signInWithPopup for desktop");
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
                 console.log("Successfully signed in with Google:", user);
                 await handleUserAuthentication(user);
                 dispatch(closeLoginModal());
-            }
         } catch (error) {
             console.error("Error signing in with Google:", error);
         }
     }
 
     const handleUserAuthentication = async (user: any) => {
-        const userDocRef = doc(db, "users", user.uid);
-        const userDocSnap = await getDoc(userDocRef);
-        if (userDocSnap.exists()) {
-            const userData = userDocSnap.data();
-            dispatch(
-                setUser({
-                    userId: userData.userId,
-                    userEmail: userData.userEmail,
-                    userSubscriptionStatus: userData.userSubscriptionStatus,
-                    userSavedBooks: userData.userSavedBooks,
-                    userFinishedBooks: userData.userFinishedBooks,
-                })
-            );
-            console.log("User data fetched from Firestore:", userData);
-        } else {
-            await setDoc(userDocRef, {
-                userId: user.uid,
-                userEmail: user.email,
-                userSubscriptionStatus: "basic",
-                userSavedBooks: [],
-                userFinishedBooks: [],
-            });
-            console.log("New user added to Firestore");
-            dispatch(
-                setUser({
+        try {
+            const userDocRef = doc(db, "users", user.uid);
+            const userDocSnap = await getDoc(userDocRef);
+            if (userDocSnap.exists()) {
+                const userData = userDocSnap.data();
+                dispatch(
+                    setUser({
+                        userId: userData.userId,
+                        userEmail: userData.userEmail,
+                        userSubscriptionStatus: userData.userSubscriptionStatus,
+                        userSavedBooks: userData.userSavedBooks,
+                        userFinishedBooks: userData.userFinishedBooks,
+                    })
+                );
+                console.log("User data fetched from Firestore:", userData);
+            } else {
+                await setDoc(userDocRef, {
                     userId: user.uid,
                     userEmail: user.email,
                     userSubscriptionStatus: "basic",
                     userSavedBooks: [],
                     userFinishedBooks: [],
-                })
-            );
-            router.push("/for-you");
+                });
+                console.log("New user added to Firestore");
+                dispatch(
+                    setUser({
+                        userId: user.uid,
+                        userEmail: user.email,
+                        userSubscriptionStatus: "basic",
+                        userSavedBooks: [],
+                        userFinishedBooks: [],
+                    })
+                );
+                router.push("/for-you");
+            }
+        } catch (error) {
+            console.error("Error handling user authentication:", error);
         }
     };
 
