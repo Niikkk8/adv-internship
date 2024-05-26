@@ -1,18 +1,41 @@
+"use client"
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
-import { BiHighlight, BiLogOut } from 'react-icons/bi';
+import { BiHighlight, BiLogIn, BiLogOut } from 'react-icons/bi';
 import { CiBookmark } from 'react-icons/ci';
 import { IoMdHelpCircleOutline } from 'react-icons/io';
 import { IoHomeOutline, IoSearchOutline, IoSettingsOutline } from 'react-icons/io5';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { closeSidebar } from '@/redux/sidebarSlice';
+import { signOut } from 'firebase/auth';
+import { openLoginModal } from '@/redux/modalSlice';
+import { auth } from '@/firebase';
+
+interface UserState {
+    userId: string | null;
+    userEmail: string | null;
+    userSubscriptionStatus: string | null;
+    userSavedBooks: string[];
+    userFinishedBooks: string[];
+}
 
 export default function Sidebar() {
+    const user = useAppSelector((state: { user: UserState }) => state.user);
     const router = usePathname();
     const dispatch = useAppDispatch();
     const isOpen = useAppSelector((state) => state.sidebar.isOpen);
     const isPlayerPage = router.includes('/player')
+
+    const handleSignOut = async () => {
+        try {
+            await signOut(auth);
+        } catch (error) {
+            console.error("Error signing out:", error);
+        }
+    };
+
 
     return (
         <div
@@ -70,10 +93,18 @@ export default function Sidebar() {
                             <IoMdHelpCircleOutline size={28} />
                             <h2 className='text-lg'>Help & Support</h2>
                         </li>
-                        <li className='flex items-center space-x-4 pl-6 pr-4 py-3 my-2 cursor-not-allowed'>
-                            <BiLogOut size={28} />
-                            <h2 className='text-lg'>Logout</h2>
-                        </li>
+                        {user.userId ?
+                            <li className='flex items-center space-x-4 pl-6 pr-4 py-3 my-2 cursor-pointer' onClick={handleSignOut}>
+                                <BiLogOut size={28} />
+                                <h2 className='text-lg'>Logout</h2>
+                            </li>
+                            :
+                            <li className='flex items-center space-x-4 pl-6 pr-4 py-3 my-2 cursor-pointer' onClick={() => dispatch(openLoginModal())}>
+                                <BiLogIn size={28} />
+                                <h2 className='text-lg'>Login</h2>
+                            </li>
+                        }
+
                     </ul>
                 </div>
             </div>
