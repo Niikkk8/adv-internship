@@ -60,18 +60,10 @@ export async function checkoutPlan(transaction: CheckoutTransactionParams) {
 
 export async function createTransaction(transaction: CreateTransactionParams) {
   try {
-    const user = useAppSelector((state: { user: UserState }) => state.user);
-    const dispatch = useAppDispatch();
-    const userDocRef = doc(db, "users", user.userId!);
+    const userDocRef = doc(db, "users", transaction.userId!);
     await updateDoc(userDocRef, {
       userSubscriptionStatus: transaction.plan,
     });
-    dispatch(
-      setUser({
-        ...user,
-        userSubscriptionStatus: transaction.plan,
-      })
-    );
   } catch (error) {
     console.error(error);
   }
