@@ -14,6 +14,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { arrayRemove, arrayUnion, doc, updateDoc } from 'firebase/firestore';
 import { setUser } from '@/redux/userSlice';
 import { db } from '@/firebase';
+import { openLoginModal } from '@/redux/modalSlice';
 
 interface BookObject {
     id: string;
@@ -61,6 +62,8 @@ export default function Page() {
     const [isInLibrary, setIsInLibrary] = useState<boolean>(
         user.userSavedBooks.includes(bookId || "")
     );
+    const isUserSubscribed: boolean = user.userSubscriptionStatus != "Basic"
+    const isPremium = !isUserSubscribed && book?.subscriptionRequired
 
     useEffect(() => {
         const fetchSelectedBook = async () => {
@@ -105,6 +108,14 @@ export default function Page() {
         )
     }
 
+    const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+        if (!user.userEmail) {
+            event.preventDefault();
+            event.stopPropagation();
+            dispatch(openLoginModal());
+        }
+    };
+
     const removeFromLibrary = async () => {
         try {
             const userDocRef = doc(db, "users", user.userId!);
@@ -144,7 +155,10 @@ export default function Page() {
             <div className='flex flex-col-reverse items-center lg:flex-row lg:items-start'>
                 <div className='px-4'>
                     <div className='text-[#032b41] py-4 border-b'>
-                        <h2 className='font-bold text-3xl'>{book?.title}</h2>
+                        <h2 className='font-bold text-3xl'>
+                            {book?.title}
+                            {isPremium && " (Premium)"}
+                        </h2>
                         <h3 className='font-semibold mt-3'>{book?.author}</h3>
                         <p className='font-light text-xl mt-2'>{book?.subTitle}</p>
                     </div>
@@ -172,8 +186,24 @@ export default function Page() {
                     </div>
                     <div>
                         <div className='flex py-6'>
-                            <Link href={`/player/${book?.id}`} className='flex items-center mr-6 py-3 px-8 bg-[#032b41] text-white rounded-md'> <VscBook className='mr-2' size={22} /> Read </Link>
-                            <Link href={`/player/${book?.id}`} className='flex items-center mr-6 py-3 px-8 bg-[#032b41] text-white rounded-md'> <IoMicOutline className='mr-2' size={22} /> Listen </Link>
+
+                            <Link
+                                href={isPremium ? `/choose-plan` : `/player/${book?.id}`}
+                                onClick={handleClick}
+                                className='flex items-center mr-6 py-3 px-8 bg-[#032b41] text-white rounded-md'
+                            >
+                                <VscBook className='mr-2' size={22} />
+                                Read
+                            </Link>
+                            <Link
+                                href={isPremium ? `/choose-plan` : `/player/${book?.id}`}
+                                onClick={handleClick}
+                                className='flex items-center mr-6 py-3 px-8 bg-[#032b41] text-white rounded-md'
+                            >
+                                <IoMicOutline className='mr-2' size={22} />
+                                Listen
+                            </Link>
+
                         </div>
                         {isInLibrary ?
                             <button className='flex items-center text-[#0365f2] font-medium text-lg mb-8' onClick={removeFromLibrary}>
@@ -201,7 +231,7 @@ export default function Page() {
                     <Image src={book?.imageLink} height={200} width={280} alt='' />
                 )}
             </div>
-        </div>
+        </div >
     );
 }
 

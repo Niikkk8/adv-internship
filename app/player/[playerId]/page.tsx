@@ -1,7 +1,8 @@
 "use client"
 
+import { useAppSelector } from '@/redux/hooks';
 import axios from 'axios';
-import { usePathname } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 
 interface BookObject {
@@ -23,11 +24,13 @@ interface BookObject {
     authorDescription: string;
 }
 
-export default function page() {
+export default function Page() {
     const pathname = usePathname();
+    const router = useRouter();
     const playerId = pathname.split('/').pop();
     const [loading, setLoading] = useState<boolean>(true);
     const [book, setBook] = useState<BookObject | undefined>();
+    const userStatus = useAppSelector((state) => state.user.userSubscriptionStatus);
 
     useEffect(() => {
         const fetchSelectedBook = async () => {
@@ -47,6 +50,16 @@ export default function page() {
         }
     }, [playerId]);
 
+    useEffect(() => {
+        if (userStatus === "Basic" && book?.subscriptionRequired) {
+            router.push("/choose-plan");
+        }
+    }, [userStatus, router]);
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
     return (
         <div className='max-w-[1200px] mx-auto px-8 py-6 pb-20 h-[calc(100vh-160px)] md:h-[calc(100vh-120px)] overflow-y-scroll no-scrollbar'>
             <h2 className='py-4 border-b text-2xl font-bold text-[#032b41]'>{book?.title}</h2>
@@ -54,5 +67,5 @@ export default function page() {
                 {book?.summary}
             </p>
         </div>
-    )
+    );
 }

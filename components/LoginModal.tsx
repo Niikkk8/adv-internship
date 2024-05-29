@@ -110,7 +110,7 @@ export default function LoginModal() {
                 await setDoc(userDocRef, {
                     userId: user.uid,
                     userEmail: user.email,
-                    userSubscriptionStatus: "basic",
+                    userSubscriptionStatus: "Basic",
                     userSavedBooks: [],
                     userFinishedBooks: [],
                 });
@@ -119,7 +119,7 @@ export default function LoginModal() {
                     setUser({
                         userId: user.uid,
                         userEmail: user.email,
-                        userSubscriptionStatus: "basic",
+                        userSubscriptionStatus: "Basic",
                         userSavedBooks: [],
                         userFinishedBooks: [],
                     })
@@ -183,7 +183,7 @@ export default function LoginModal() {
                 await setDoc(userDocRef, {
                     userId: user.uid,
                     userEmail: signupFormData.email,
-                    userSubscriptionStatus: "basic",
+                    userSubscriptionStatus: "Basic",
                     userSavedBooks: [],
                     userFinishedBooks: [],
                 });
@@ -192,7 +192,7 @@ export default function LoginModal() {
                     setUser({
                         userId: user.uid,
                         userEmail: signupFormData.email,
-                        userSubscriptionStatus: "basic",
+                        userSubscriptionStatus: "Basic",
                         userSavedBooks: [],
                         userFinishedBooks: [],
                     })

@@ -81,13 +81,13 @@ export default function Page() {
                         {selectedBookLoading ?
                             <>
                                 <div className='md:w-[40%] px-4 py-2 mr-2'>
-                                    <Skeleton sx={{ fontSize: '24px' }} />
+                                    <Skeleton animation="wave" sx={{ fontSize: '24px' }} />
                                 </div>
                                 <div className='flex md:border-l border-gray-500 pl-4 w-full'>
                                     <Skeleton variant='rectangular' width={140} height={160} animation="wave" />
                                     <div className='ml-2 w-[50%]'>
-                                        <Skeleton sx={{ fontSize: '24px' }} />
-                                        <Skeleton sx={{ fontSize: '18px' }} />
+                                        <Skeleton animation="wave" sx={{ fontSize: '24px' }} />
+                                        <Skeleton animation="wave" sx={{ fontSize: '18px' }} />
                                     </div>
                                 </div>
                             </>

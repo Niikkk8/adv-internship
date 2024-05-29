@@ -1,3 +1,4 @@
+import { useAppSelector } from '@/redux/hooks';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
@@ -33,6 +34,7 @@ const formatTime = (timeInSeconds: number): string => {
 
 const BookCard: React.FC<{ book: BookObject }> = ({ book }) => {
     const [audioDuration, setAudioDuration] = useState<number | null>(null);
+    const isUserSubscribed: boolean = useAppSelector((state) => state.user.userSubscriptionStatus) != "Basic"
 
     useEffect(() => {
         if (book && book.audioLink) {
@@ -52,7 +54,7 @@ const BookCard: React.FC<{ book: BookObject }> = ({ book }) => {
     };
 
     return (
-        <div className='min-w-[40%] max-w-[40%] sm:min-w-[25%] sm:max-w-[30%] lg:min-w-[18%] lg:max-w-[20%] w-min mx-2 p-2 pb-4 pt-6 hover:bg-[#f1f6f4] rounded-lg'>
+        <div className='min-w-[40%] max-w-[40%] sm:min-w-[25%] sm:max-w-[30%] lg:min-w-[18%] lg:max-w-[20%] w-min mx-2 p-2 pb-4 pt-6 hover:bg-[#f1f6f4] rounded-lg relative'>
             <Link href={`/book/${book.id}`}>
                 <Image src={book.imageLink} height={180} width={180} alt='' />
                 <h2 className='font-bold mt-2'>{book.title}</h2>
@@ -64,6 +66,10 @@ const BookCard: React.FC<{ book: BookObject }> = ({ book }) => {
                     <FaRegClock className='ml-2 mr-1' />
                     {audioDuration && formatTime(audioDuration)}
                 </p>
+                {!isUserSubscribed &&
+                    book.subscriptionRequired &&
+                    <p className='bg-[#032b41] w-fit rounded-full text-white text-xs px-4 py-1 absolute top-1 right-1'>Premium</p>
+                }
             </Link>
         </div>
     );

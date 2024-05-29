@@ -20,14 +20,6 @@ interface CreateTransactionParams {
   userId: string;
 }
 
-interface UserState {
-  userId: string | null;
-  userEmail: string | null;
-  userSubscriptionStatus: string | null;
-  userSavedBooks: string[];
-  userFinishedBooks: string[];
-}
-
 export async function checkoutPlan(transaction: CheckoutTransactionParams) {
   const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_KEY!);
 
