@@ -79,16 +79,30 @@ export default function LoginModal() {
     async function handleSignInWithGoogle(e: React.MouseEvent<HTMLButtonElement>) {
         e.preventDefault();
         try {
-                console.log("Using signInWithPopup for desktop");
-                const result = await signInWithPopup(auth, provider);
-                const user = result.user;
-                console.log("Successfully signed in with Google:", user);
-                await handleUserAuthentication(user);
-                dispatch(closeLoginModal());
+            console.log("Using signInWithPopup for desktop");
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+            console.log("Successfully signed in with Google:", user);
+            await handleUserAuthentication(user);
+            dispatch(closeLoginModal());
         } catch (error) {
             console.error("Error signing in with Google:", error);
         }
     }
+
+    const handleLoginAsGuest = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, "demoemail@gmail.com", "demoPassword");
+            const user = userCredential.user;
+            console.log("User signed in as guest:", user);
+            await handleUserAuthentication(user);
+            dispatch(closeLoginModal());
+            router.push("/for-you");
+        } catch (error) {
+            console.error("Error signing in as guest:", error);
+        }
+    };
 
     const handleUserAuthentication = async (user: any) => {
         try {
@@ -133,7 +147,7 @@ export default function LoginModal() {
 
     const handleLoginSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoginError(null); // Reset previous errors
+        setLoginError(null);
         if (loginFormData.email && loginFormData.password) {
             try {
                 const userCredential = await signInWithEmailAndPassword(
@@ -169,7 +183,7 @@ export default function LoginModal() {
 
     const handleSignupSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setSignupError(null); // Reset previous errors
+        setSignupError(null);
         if (signupFormData.email && signupFormData.password) {
             try {
                 const authResult = await createUserWithEmailAndPassword(
@@ -236,7 +250,7 @@ export default function LoginModal() {
                             <h1 className="text-center text-xl font-bold text-[#032b41] mb-4">
                                 Log in to Summarist
                             </h1>
-                            <button className="flex items-center justify-between my-2 button-transform bg-[#3a579d] text-white p-2 rounded-md w-full">
+                            <button className="flex items-center justify-between my-2 button-transform bg-[#3a579d] text-white p-2 rounded-md w-full" onClick={handleLoginAsGuest}>
                                 <TbUserFilled size={22} />
                                 <p className="mr-6">Login as a Guest</p>
                                 <div />
