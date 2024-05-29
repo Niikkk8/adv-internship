@@ -150,9 +150,9 @@ export default function Page() {
                     <div className='flex flex-col-reverse items-center lg:flex-row lg:items-start'>
                         <div className='px-4 w-[70%]'>
                             <div className='text-[#032b41] py-4 border-b'>
-                                <Skeleton animation="wave" height={60} />
-                                <Skeleton animation="wave" height={30} />
-                                <Skeleton animation="wave" height={40} />
+                                <Skeleton animation="wave" height={60} className='w-[50%]' />
+                                <Skeleton animation="wave" height={30} className='w-[20%]'/>
+                                <Skeleton animation="wave" height={40} className='w-[30%]'/>
                             </div>
                             <div className='py-4 border-b flex items-center text-[#032b41]'>
                                 <div className='mr-20'>
