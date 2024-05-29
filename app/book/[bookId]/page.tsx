@@ -128,6 +128,10 @@ export default function Page() {
     }
 
     const addToLibrary = async () => {
+        if (!user.userEmail) {
+            dispatch(openLoginModal())
+            return
+        }
         try {
             const userDocRef = doc(db, "users", user.userId!);
             await updateDoc(userDocRef, {
@@ -151,8 +155,8 @@ export default function Page() {
                         <div className='px-4 w-[70%]'>
                             <div className='text-[#032b41] py-4 border-b'>
                                 <Skeleton animation="wave" height={60} className='w-[50%]' />
-                                <Skeleton animation="wave" height={30} className='w-[20%]'/>
-                                <Skeleton animation="wave" height={40} className='w-[30%]'/>
+                                <Skeleton animation="wave" height={30} className='w-[20%]' />
+                                <Skeleton animation="wave" height={40} className='w-[30%]' />
                             </div>
                             <div className='py-4 border-b flex items-center text-[#032b41]'>
                                 <div className='mr-20'>
