@@ -67,15 +67,17 @@ export default function SearchBar() {
                             <div className='mt-4 absolute top-12 left-0 z-50'>
                                 {loading ?
                                     <>
-                                        {
-                                            new Array(6).fill(0).map((_, index) => (
-                                                <Skeleton width={280} height={40} key={index} />
-                                            ))
-                                        }
+                                        <div className='p-1 bg-white shadow-md rounded-md h-80 overflow-y-scroll'>
+                                            {
+                                                new Array(6).fill(0).map((_, index) => (
+                                                    <Skeleton width={280} height={40} key={index} />
+                                                ))
+                                            }
+                                        </div>
                                     </>
                                     :
                                     <>{searchResults.length > 1 &&
-                                        <ul className='p-1 shadow-md rounded-md h-80 overflow-y-scroll'>
+                                        <ul className='p-1 bg-white shadow-md rounded-md h-80 overflow-y-scroll'>
                                             {searchResults.map((result) => (
                                                 <li key={result.id} className='border-b'>
                                                     <Link href={`/book/${result.id}`}>
