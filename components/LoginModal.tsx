@@ -7,6 +7,8 @@ import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     onAuthStateChanged,
+    signInWithRedirect,
+    getRedirectResult,
 } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import { CgClose } from "react-icons/cg";
@@ -76,15 +78,28 @@ export default function LoginModal() {
         setSignupFormData({ ...signupFormData, [name]: value });
     };
 
+    useEffect(() => {
+        const handleRedirectResult = async () => {
+            try {
+                const result = await getRedirectResult(auth);
+                if (result) {
+                    const user = result.user;
+                    console.log("Successfully signed in with Google:", user);
+                    handleUserAuthentication(user);
+                    dispatch(closeLoginModal());
+                }
+            } catch (error) {
+                console.error("Error signing in with Google:", error);
+            }
+        };
+        
+        handleRedirectResult();
+    }, [dispatch]);
+
     async function handleSignInWithGoogle(e: React.MouseEvent<HTMLButtonElement>) {
         e.preventDefault();
         try {
-            console.log("Using signInWithPopup for desktop");
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
-            console.log("Successfully signed in with Google:", user);
-            await handleUserAuthentication(user);
-            dispatch(closeLoginModal());
+            await signInWithRedirect(auth, provider);
         } catch (error) {
             console.error("Error signing in with Google:", error);
         }
@@ -200,17 +215,7 @@ export default function LoginModal() {
                     userSubscriptionStatus: "Basic",
                     userSavedBooks: [],
                     userFinishedBooks: [],
-                });
-                console.log("New user added to Firestore");
-                dispatch(
-                    setUser({
-                        userId: user.uid,
-                        userEmail: signupFormData.email,
-                        userSubscriptionStatus: "Basic",
-                        userSavedBooks: [],
-                        userFinishedBooks: [],
-                    })
-                );
+                })
                 dispatch(closeLoginModal());
                 setSignupFormData({ email: "", password: "" });
                 router.push("/for-you");
