@@ -1,6 +1,7 @@
 import { db } from "@/firebase";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setUser } from "@/redux/userSlice";
+import { Skeleton } from "@mui/material";
 import axios from "axios";
 import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import Image from "next/image";
@@ -118,41 +119,63 @@ export default function AudioPlayer() {
         }
     };
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
     return (
         <div className="h-[160px] bg-[#042330]">
-            <div className="max-w-[1400px] mx-auto h-full flex flex-col md:flex-row items-center justify-between px-4">
-                <div className="flex items-center justify-center w-[80%] md:w-[30%]">
-                    <Image src={book?.imageLink || ''} alt="" height={60} width={60} className="py-2" />
-                    <div className="ml-2">
-                        <h3 className="text-sm md:text-md text-white">{book?.title}</h3>
-                        <h4 className="text-xs md:text-sm text-gray-300">{book?.author}</h4>
+            {
+                loading ?
+                    <div className="max-w-[1400px] mx-auto h-full flex flex-col md:flex-row items-center justify-between px-4">
+                        <div className="flex items-center justify-center w-[80%] md:w-[30%]">
+                            <Skeleton animation="wave" height={120} width={60} className="py-2 bg-gray-400" />
+                            <div className="ml-2">
+                                <Skeleton variant="text" width={120} className="bg-gray-400" />
+                                <Skeleton variant="text" width={80} className="bg-gray-400" />
+                            </div>
+                        </div>
+                        <Controls
+                            isPlaying={isPlaying}
+                            onPlayPause={handlePlayPause}
+                            onSkipForward={handleSkipForward}
+                            onSkipBackward={handleSkipBackward}
+                        />
+                        <ProgressBar
+                            currentTime={currentTime}
+                            duration={duration}
+                            onProgressChange={handleProgressChange}
+                            formatTime={formatTime}
+                            playerId={playerId}
+                        />
                     </div>
-                </div>
-                <audio
-                    ref={audioRef}
-                    src={book?.audioLink}
-                    preload="metadata"
-                    onTimeUpdate={() => setCurrentTime(audioRef.current?.currentTime || 0)}
-                    onEnded={() => setIsPlaying(false)}
-                />
-                <Controls
-                    isPlaying={isPlaying}
-                    onPlayPause={handlePlayPause}
-                    onSkipForward={handleSkipForward}
-                    onSkipBackward={handleSkipBackward}
-                />
-                <ProgressBar
-                    currentTime={currentTime}
-                    duration={duration}
-                    onProgressChange={handleProgressChange}
-                    formatTime={formatTime}
-                    playerId={playerId}
-                />
-            </div>
+                    :
+                    <div className="max-w-[1400px] mx-auto h-full flex flex-col md:flex-row items-center justify-between px-4">
+                        <div className="flex items-center justify-center w-[80%] md:w-[30%]">
+                            <Image src={book?.imageLink || ''} alt="" height={60} width={60} className="py-2" />
+                            <div className="ml-2">
+                                <h3 className="text-sm md:text-md text-white">{book?.title}</h3>
+                                <h4 className="text-xs md:text-sm text-gray-300">{book?.author}</h4>
+                            </div>
+                        </div>
+                        <audio
+                            ref={audioRef}
+                            src={book?.audioLink}
+                            preload="metadata"
+                            onTimeUpdate={() => setCurrentTime(audioRef.current?.currentTime || 0)}
+                            onEnded={() => setIsPlaying(false)}
+                        />
+                        <Controls
+                            isPlaying={isPlaying}
+                            onPlayPause={handlePlayPause}
+                            onSkipForward={handleSkipForward}
+                            onSkipBackward={handleSkipBackward}
+                        />
+                        <ProgressBar
+                            currentTime={currentTime}
+                            duration={duration}
+                            onProgressChange={handleProgressChange}
+                            formatTime={formatTime}
+                            playerId={playerId}
+                        />
+                    </div>
+            }
         </div>
     );
 }

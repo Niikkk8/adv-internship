@@ -1,6 +1,7 @@
 "use client"
 
 import { useAppSelector } from '@/redux/hooks';
+import { Skeleton } from '@mui/material';
 import axios from 'axios';
 import { useRouter, usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
@@ -56,16 +57,23 @@ export default function Page() {
         }
     }, [userStatus, router]);
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
     return (
         <div className='max-w-[1200px] mx-auto px-8 py-6 pb-20 h-[calc(100vh-160px)] md:h-[calc(100vh-120px)] overflow-y-scroll no-scrollbar'>
-            <h2 className='py-4 border-b text-2xl font-bold text-[#032b41]'>{book?.title}</h2>
-            <p className='whitespace-pre-line py-4'>
-                {book?.summary}
-            </p>
+            {
+                loading ?
+                    <>
+                        <Skeleton animation="wave" width={240} className='py-4' />
+                        <div className='border-b mb-2' />
+                        <Skeleton height={300} className='w-[80%}' />
+                    </>
+                    :
+                    <>
+                        <h2 className='py-4 border-b text-2xl font-bold text-[#032b41]'>{book?.title}</h2>
+                        <p className='whitespace-pre-line py-4'>
+                            {book?.summary}
+                        </p>
+                    </>
+            }
         </div>
     );
 }
